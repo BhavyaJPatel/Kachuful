@@ -1,0 +1,29 @@
+.score {
+  /* width: 400px; */
+  position: absolute;
+  left: 20px;
+  top: calc(100vh - 154px);
+  background-color: #10121477;
+  color: #eee;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-evenly;
+  gap: 20px;
+  padding: 20px 20px;
+  z-index: -1000;
+  width: 350px;
+  height: 135px;
+  flex-wrap: wrap;
+}
+
+.score div {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-direction: column;
+  /* flex-grow: 1; */
+  /* flex-shrink: 1; */
+  width: 60px;
+  flex-shrink: 0;
+  /* border: 2px solid #ae0000; */
+}

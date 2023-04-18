@@ -1,0 +1,89 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.guess {
+  background-color: #161e25;
+  border-radius: 5px;
+  width: 850px;
+  height: 350px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  flex-direction: column;
+  color: #ddd;
+  font-size: 1.1rem;
+  z-index: 1050;
+}
+.guess .guesses {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  gap: 10px;
+}
+
+.guess .palyers-guesses {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  flex-grow: 1;
+}
+.guess .palyers-guesses hr {
+  height: 80%;
+}
+
+.guess .palyers-guesses .guess-p1,
+.guess .palyers-guesses .guess-p2,
+.guess .palyers-guesses .guess-p3,
+.guess .palyers-guesses .guess-p4,
+.guess .palyers-guesses .guess-p5 {
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.guess .palyers-guesses .guess-p1 hr,
+.guess .palyers-guesses .guess-p2 hr,
+.guess .palyers-guesses .guess-p3 hr,
+.guess .palyers-guesses .guess-p4 hr,
+.guess .palyers-guesses .guess-p5 hr {
+  transform: rotate(90deg);
+  width: 1px;
+  height: 70px;
+}
+
+.guess .guesses .guess-btn {
+  width: 60px;
+  height: 40px;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background-color: #4fc3dc;
+  transition: 0.4s;
+  font-size: 1rem;
+  color: #0c192c;
+  font-weight: bold;
+}
+
+.guess .guesses .guess-btn:hover {
+  transform: scale(1.1);
+  transition: 0.4s;
+}
+
+.guess .guesses .guess-btn:disabled,
+.guess .guesses .guess-btn[disabled] {
+  background-color: #ddd;
+}
+
+.guess .guesses .guess-btn:disabled:hover,
+.guess .guesses .guess-btn[disabled]:hover {
+  transform: scale(1);
+}

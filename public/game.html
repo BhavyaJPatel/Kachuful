@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style/home.css">
+    <link rel="stylesheet" href="./style/game.css">
+    <link rel="stylesheet" href="./style/loby.css">
+    <link rel="stylesheet" href="./style/table.css">
+    <link rel="stylesheet" href="./style/main.css">
+    <link rel="stylesheet" href="./style/guess.css">
+    <link rel="stylesheet" href="./style/cards.css">
+    <link rel="stylesheet" href="./style/new.css">
+    <link rel="stylesheet" href="./style/otherPlayers.css">
+    <link rel="stylesheet" href="./style/score.css">
+    <link rel="stylesheet" href="./style/trumpCard.css">
+    <title>Game</title>
+
+</head>
+
+<body>
+
+    <!-- 8888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888 -->
+
+    <div class="modal">
+        <div class="form">
+            <form action="">
+                <label for="playerName">In Game Name</label>
+                <input type="text" name="playerName" class="player-name-input" maxlength="7">
+                <button type="submit" class="ragister-name">Ragister</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 8888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888 -->
+
+    <div class="container">
+        <div class="bubbles">
+            <div style="--i:11">&#9830;</div>
+            <div style="--i:12">&#9824;</div>
+            <div style="--i:24">&#9829;</div>
+            <div style="--i:10">&#9827;</div>
+            <div style="--i:14">&#9830;</div>
+            <div style="--i:23">&#9824;</div>
+            <div style="--i:18">&#9829;</div>
+            <div style="--i:16">&#9827;</div>
+            <div style="--i:19">&#9830;</div>
+            <div style="--i:20">&#9824;</div>
+            <div style="--i:22">&#9829;</div>
+            <div style="--i:25">&#9827;</div>
+            <div style="--i:18">&#9830;</div>
+            <div style="--i:21">&#9824;</div>
+            <div style="--i:15">&#9829;</div>
+            <div style="--i:13">&#9827;</div>
+            <div style="--i:16">&#9830;</div>
+            <div style="--i:17">&#9824;</div>
+            <div style="--i:13">&#9829;</div>
+            <div style="--i:28">&#9827;</div>
+            <div style="--i:11">&#9830;</div>
+            <div style="--i:12">&#9824;</div>
+            <div style="--i:24">&#9829;</div>
+            <div style="--i:10">&#9827;</div>
+            <div style="--i:14">&#9830;</div>
+            <div style="--i:23">&#9824;</div>
+            <div style="--i:18">&#9829;</div>
+            <div style="--i:16">&#9827;</div>
+            <div style="--i:19">&#9830;</div>
+            <div style="--i:20">&#9824;</div>
+            <div style="--i:22">&#9829;</div>
+            <div style="--i:25">&#9827;</div>
+            <div style="--i:18">&#9830;</div>
+            <div style="--i:21">&#9824;</div>
+            <div style="--i:15">&#9829;</div>
+            <div style="--i:13">&#9827;</div>
+            <div style="--i:16">&#9830;</div>
+            <div style="--i:17">&#9824;</div>
+            <div style="--i:13">&#9829;</div>
+            <div style="--i:28">&#9827;</div>
+        </div>
+    </div>
+
+
+    <div class="room">
+        <div class="create-room">
+            <form action="">
+                <label for="create">Create Room</label>
+                <button name="create" id='create' type="submit">Generate</button>
+            </form>
+        </div>
+        <div class="join-room">
+            <form action="">
+                <label for="">Join Room</label>
+                <input type="text" name="" id="" placeholder="Entet Code">
+                <button type="submit">Join</button>
+            </form>
+        </div>
+    </div>
+    <!-- 8888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888 -->
+
+    <div class="loby">
+        <div class="roomCode">
+            <p>Room code : <span></span></p>
+        </div>
+        <div class="playerloby">Players</div>
+        <div class="playersList"></div>
+        <div class="button">
+            <button>Lets Go...</button>
+        </div>
+    </div>
+
+    <!-- 8888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888 -->
+    <div class="after-round-score-card">
+        <div class="overlay"></div>
+    </div>
+    <!-- 8888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888 -->
+    <div class="game">
+        <div class="otherPlayers"></div>
+        <div class="background"></div>
+        <div class="score"></div>
+        <div class="box"></div>
+        <div class="round">
+            <div class="trump">
+                <p>Trump Card</p>
+                <span>
+                    &#9830;
+                </span>
+            </div>
+            <hr>
+            <div class="curentRound">
+                <p>Round Number</p>
+                <p><span>1</span>/8</p>
+            </div>
+        </div>
+    </div>
+    <!-- 8888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888 -->
+    <div class="guess">
+        <div class="guesses">
+            <button class="guess0 guess-btn">0</button>
+
+        </div>
+        <hr>
+        <div class="palyers-guesses">
+            <div class="guess-p1">
+                <p>Player-1</p>
+                <hr>
+                <p>Guess</p>
+            </div>
+            <hr>
+            <div class="guess-p2">
+                <p>Player-2</p>
+                <hr>
+                <p>Guess</p>
+            </div>
+            <hr>
+            <div class="guess-p3">
+                <p>Player-3</p>
+                <hr>
+                <p>Guess</p>
+            </div>
+            <hr>
+            <div class="guess-p4">
+                <p>Player-4</p>
+                <hr>
+                <p>Guess</p>
+            </div>
+            <hr>
+            <div class="guess-p5">
+                <p>Player-5</p>
+                <hr>
+                <p>Guess</p>
+            </div>
+        </div>
+    </div>
+    <!-- 8888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888 -->
+    <div class="overlay-back"></div>
+
+    <!-- 8888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888 -->
+
+    <!-- 8888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888888 -->
+
+</body>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="./game.js "></script>
+</body>
+
+</html>

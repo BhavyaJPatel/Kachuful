@@ -1,0 +1,74 @@
+.otherPlayers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100vh - 230px);
+  display: flex;
+  justify-content: space-between;
+}
+
+.player {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  font-weight: bold;
+  color: #ddd;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #101214;
+  backdrop-filter: blur(3px);
+  transform: scale(1.2);
+}
+
+.player .player-playerInfo {
+  font-size: 0.8rem;
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.otherPlayerInfo {
+  display: flex;
+  /* justify-content: center; */
+  align-items: center;
+  flex-direction: column;
+}
+
+.otherPlayerInfo:first-child,
+.otherPlayerInfo:last-child {
+  align-self: flex-end;
+}
+
+.otherPlayerInfo:first-child {
+  padding-left: 20px;
+}
+
+.otherPlayerInfo:last-child {
+  padding-right: 20px;
+}
+
+.otherPlayerInfo:nth-child(2),
+.otherPlayerInfo:nth-child(3) {
+  padding-top: 20px;
+}
+
+.player-playerGuessing {
+  color: #ddd;
+  font-weight: bold;
+  margin-top: 10px;
+  text-align: center;
+  width: 140%;
+  height: 30px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  box-shadow: 0 0 #ddd, 0 0 50px #ddd, 0 0 100px #ddd;
+  background-color: #101214aa;
+}

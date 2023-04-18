@@ -1,0 +1,51 @@
+.round {
+  width: 350px;
+  height: 135px;
+  position: absolute;
+  right: 20px;
+  top: calc(100vh - 154px);
+  background-color: #10121477;
+  color: #eee;
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  z-index: -10000;
+}
+
+.round .trump {
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1;
+}
+
+.round .trump span {
+  font-size: 60px;
+}
+
+hr {
+  display: flex;
+  align-self: center;
+  height: 70%;
+}
+
+.curentRound {
+  display: flex;
+  justify-content: center;
+  align-items: centet;
+  flex: 1;
+  align-items: center;
+  font-size: 1rem;
+  flex-direction: column;
+}
+
+.curentRound p:last-child {
+  height: 79px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+}
