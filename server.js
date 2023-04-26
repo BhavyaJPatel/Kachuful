@@ -27,7 +27,9 @@ let myGuess = undefined;
 let cards = undefined;
 let score = undefined;
 let isGuessed = undefined;
+let currentCard = undefined;
 let isCompultion = undefined;
+let currentHands = undefined;
 
 // function to generate random cards
 const randomCards = (roundNuber) => {
@@ -76,10 +78,12 @@ io.on("connection", (socket) => {
     isMyTurn = false;
     myGuess = undefined;
     cards = [];
-    score = 0;
+    score = [];
     isMyFirstTurn = false;
     isGuessed = false;
     isCompultion = false;
+    currentCard = undefined;
+    currentHands = 0;
   });
 
   // create room
@@ -99,6 +103,8 @@ io.on("connection", (socket) => {
       isMyFirstTurn,
       isGuessed,
       isCompultion,
+      currentCard,
+      currentHands,
     });
     // sendign room object
     socket.emit("joinTheRoom", { roomCode: roomNumber });
@@ -126,6 +132,8 @@ io.on("connection", (socket) => {
         isMyFirstTurn,
         isGuessed,
         isCompultion,
+        currentCard,
+        currentHands,
       });
       socket.join(`${roomCode.roomCode}`);
       io.to(`${roomCode.roomCode}`).emit(
@@ -156,6 +164,89 @@ io.on("connection", (socket) => {
       "round1guess",
       roomMembers[`${data.roomNumber}`]
     );
-    console.log(data);
+    let allGuesses = true;
+    for (let i = 0; i < 5; i++) {
+      if (roomMembers[`${data.roomNumber}`][i].isGuessed == false) {
+        allGuesses = false;
+        break;
+      }
+    }
+    if (allGuesses == true) {
+      roomMembers[`${data.roomNumber}`][0].isMyFirstTurn = true;
+      io.to(`${data.roomNumber}`).emit(
+        "start-game-1",
+        roomMembers[`${data.roomNumber}`]
+      );
+    }
+  });
+
+  socket.on("card-number", (p_info) => {
+    console.log(p_info);
+    roomMembers[`${p_info.roomCode}`][p_info.index].isMyTurn = false;
+    roomMembers[`${p_info.roomCode}`][p_info.index].currentCard = p_info.card;
+    roomMembers[`${p_info.roomCode}`][(p_info.index + 1) % 5].isMyTurn = true;
+    io.to(`${p_info.roomCode}`).emit(
+      "card-number",
+      roomMembers[`${p_info.roomCode}`]
+    );
+    let allGuessed = true;
+    for (let i = 0; i < 5; i++) {
+      if (roomMembers[`${p_info.roomCode}`][i].currentCard == undefined) {
+        allGuessed = false;
+        break;
+      }
+    }
+    if (allGuessed == true) {
+      io.to(`${p_info.roomCode}`).emit(
+        "completeItetration",
+        roomMembers[`${p_info.roomCode}`]
+      );
+    }
+  });
+
+  socket.on("score", (p_info) => {
+    roomMembers[p_info.roomCode][p_info.index].currentHands += 1;
+    io.to(`${p_info.roomCode}`).emit(
+      "score",
+      roomMembers[`${p_info.roomCode}`]
+    );
+  });
+
+  socket.on("completeRound", (p_info) => {
+    let firstPlayerIndex = undefined;
+    for (let i = 0; i < 5; i++) {
+      if (roomMembers[p_info.roomCode][i].isMyFirstTurn == true) {
+        firstPlayerIndex = i;
+      }
+      roomMembers[p_info.roomCode][i].score.push(p_info.obj[i]);
+      roomMembers[p_info.roomCode][i].isMyTurn = false;
+      roomMembers[p_info.roomCode][i].myGuess = undefined;
+      roomMembers[p_info.roomCode][i].isMyFirstTurn = false;
+      roomMembers[p_info.roomCode][i].isGuessed = false;
+      roomMembers[p_info.roomCode][i].isCompultion = false;
+      roomMembers[p_info.roomCode][i].currentCard = undefined;
+      roomMembers[p_info.roomCode][i].currentHands = 0;
+    }
+
+    roomMembers[p_info.roomCode][
+      (firstPlayerIndex + 1) % 5
+    ].isMyFirstTurn = true;
+
+    roomMembers[p_info.roomCode][(firstPlayerIndex + 1) % 5].isMyTurn = true;
+
+    roomMembers[p_info.roomCode][firstPlayerIndex].isCompultion = true;
+
+    const cards = randomCards(p_info.roundNumber + 1);
+
+    for (let i = 0; i < 5; i++) {
+      roomMembers[p_info.roomCode][i].cards = cards[i];
+    }
+
+    console.log(roomMembers[p_info.roomCode]);
+    io.to(`${p_info.roomCode}`).emit(
+      `start-round-${p_info.roundNumber + 1}`,
+      roomMembers[p_info.roomCode]
+    );
   });
 });
+
