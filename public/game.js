@@ -1,6 +1,7 @@
 // connecting to the socket server
 const socket = io("https://kachuful.onrender.com/");
 
+
 // on connection this code will be executed
 socket.on("connect", () => {
   console.log("Connected");
@@ -143,17 +144,17 @@ const popPopScoreCard = (data, round) => {
   for (let i = 1; i < currentRound; i++) {
     currentScore += `<tr>
     <td class='${i % 2 ? "" : "red"}'>${cardType[(i - 1) % 4]}</td>
-    <td class="score-p1r${i}">${data[0].score[i]}</td>
-    <td class="score-p2r${i}">${data[1].score[i]}</td>
-    <td class="score-p3r${i}">${data[2].score[i]}</td>
-    <td class="score-p4r${i}">${data[3].score[i]}</td>
-    <td class="score-p5r${i}">${data[4].score[i]}</td>
+    <td class="score-p1r${i}">${data[0].score[i - 1]}</td>
+    <td class="score-p2r${i}">${data[1].score[i - 1]}</td>
+    <td class="score-p3r${i}">${data[2].score[i - 1]}</td>
+    <td class="score-p4r${i}">${data[3].score[i - 1]}</td>
+    <td class="score-p5r${i}">${data[4].score[i - 1]}</td>
     </tr>`;
-    totalScoreOfP1 += data[0].score[i];
-    totalScoreOfP2 += data[1].score[i];
-    totalScoreOfP3 += data[2].score[i];
-    totalScoreOfP4 += data[3].score[i];
-    totalScoreOfP5 += data[4].score[i];
+    totalScoreOfP1 += data[0].score[i - 1];
+    totalScoreOfP2 += data[1].score[i - 1];
+    totalScoreOfP3 += data[2].score[i - 1];
+    totalScoreOfP4 += data[3].score[i - 1];
+    totalScoreOfP5 += data[4].score[i - 1];
   }
   for (let i = currentRound; i <= 10; i++) {
     remaningScore += `<tr>
@@ -184,7 +185,7 @@ const hideScoreCard = () => {
   setTimeout(() => {
     document.querySelector(".after-round-score-card").style.display = "none";
     document.querySelector(".overlay-back").style.display = `none`;
-  }, 6000);
+  }, 1000);
 };
 
 const createCards = (cards) => {
@@ -255,7 +256,7 @@ const createCards = (cards) => {
       }
       card = `<div class="card card-number-${lenOfCards}${i + 1}">
         <button class="${
-          cardCode == "&#9829;" || cardCode == "&#9830;" ? "red" : ""
+          cardCode == "&#9829;" || cardCode == "&#9830;" ? "red" : "black"
         }" value='${cN}'>
         <div class="icon">${cardCode}</div>
         <div class="num ten">${cardNuber == 1 ? "A" : cardNuber}</div>
@@ -267,7 +268,7 @@ const createCards = (cards) => {
         `;
     } else if (cardCode == "&#9824;" || cardCode == "&#9827;") {
       card = `<div class="card card-number-${lenOfCards}${i + 1}">
-    <button class='c${cardNuber}b' value='${cN}'>
+    <button class='c${cardNuber}b black' value='${cN}'>
         <div class="num ten">${cardNuber}</div>
         <div class="icon">${cardCode}</div>
         <div class="rev-icon">${cardCode}</div>
@@ -288,7 +289,6 @@ const createCards = (cards) => {
     }
     cardsDom += card;
   }
-  console.log(cardsDom);
   return cardsDom;
 };
 
@@ -341,7 +341,7 @@ const guess = (players, p1_index, roundNumber, rc, disable = false) => {
                 <p>${
                   players[p1_i].myGuess == undefined
                     ? "-"
-                    : players[p1_i].myGuess
+                    : ` ${players[p1_i].myGuess} `
                 }</p>
             </div>
             <hr>
@@ -383,7 +383,7 @@ const guess = (players, p1_index, roundNumber, rc, disable = false) => {
                     ? "-"
                     : players[p5_i].myGuess
                 }</p>
-            </div>`;
+                </div>`;
   let guessHtml = `<div class="guesses">${btnHtml}</div><div class="palyers-guesses">${playersHtml}</div>`;
 
   document.querySelector(".guess").style.display = `flex`;
@@ -395,79 +395,400 @@ const guess = (players, p1_index, roundNumber, rc, disable = false) => {
         guess: Number(btn.value),
         roomNumber: rc,
       });
-
       document.querySelector(".guess").style.display = `none`;
     });
   });
 };
 
+// ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const playCards = (players, roundNumber, rc) => {
+  let p1_index = undefined;
+  players.forEach((player, index) => {
+    if (player.isMyFirstTurn == true) {
+      p1_index = index;
+    }
+  });
+
+  let myIndex = undefined;
+  players.forEach((p, i) => {
+    if (socket.id == p.id) {
+      myIndex = i;
+    }
+  });
+
+  if (socket.id == players[p1_index].id && players[p1_index].isMyTurn == true) {
+    let p1_guessedValue = undefined;
+    const cards = document.querySelectorAll(".box .card");
+    const buttons = document.querySelectorAll(".box .card button");
+    buttons.forEach((btn, index) => {
+      btn.disabled = false;
+      btn.addEventListener("click", () => {
+        p1_guessedValue = btn.value;
+        cards[index].style.animation = "slideup 1s ease-out 0s 1 forwards";
+        buttons.forEach((b, i) => {
+          b.disabled = true;
+        });
+        socket.emit("card-number", {
+          roomCode: rc,
+          index: p1_index,
+          card: p1_guessedValue,
+        });
+      });
+    });
+  } else {
+    let p_guessedValue = undefined;
+    let firstCard = players[p1_index].currentCard;
+    let lower = undefined;
+    let upper = undefined;
+    if (firstCard < 13) {
+      lower = 0;
+      upper = 12;
+    } else if (firstCard < 26) {
+      lower = 13;
+      upper = 25;
+    } else if (firstCard < 39) {
+      lower = 26;
+      upper = 38;
+    } else {
+      lower = 39;
+      upper = 51;
+    }
+    const cards = document.querySelectorAll(".box .card");
+    const buttons = document.querySelectorAll(".box .card button");
+
+    let cardExist = false;
+    buttons.forEach((btn) => {
+      if (btn.value >= lower && btn.value <= upper) {
+        cardExist = true;
+      }
+    });
+
+    if (!cardExist) {
+      buttons.forEach((btn, index) => {
+        btn.disabled = false;
+        btn.addEventListener("click", () => {
+          p_guessedValue = btn.value;
+          cards[index].style.animation = "slideup 1s ease-out 0s 1 forwards";
+          buttons.forEach((b, i) => {
+            b.disabled = true;
+          });
+          socket.emit("card-number", {
+            roomCode: rc,
+            index: myIndex,
+            card: p_guessedValue,
+          });
+        });
+      });
+    } else {
+      buttons.forEach((btn, index) => {
+        if (btn.value >= lower && btn.value <= upper) {
+          btn.disabled = false;
+          btn.addEventListener("click", () => {
+            p_guessedValue = btn.value;
+            cards[index].style.animation = "slideup 1s ease-out 0s 1 forwards";
+            buttons.forEach((b, i) => {
+              b.disabled = true;
+            });
+            socket.emit("card-number", {
+              roomCode: rc,
+              index: myIndex,
+              card: p_guessedValue,
+            });
+          });
+        }
+      });
+    }
+  }
+};
+
+// ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const completeRound = (players, roomCode, roundNumber) => {
+  let p1_Index = undefined;
+  for (let i = 0; i < 5; i++) {
+    if (players[i].isMyFirstTurn == true) {
+      p1_Index = i;
+      break;
+    }
+  }
+  let p2_Index = (p1_Index + 1) % 5;
+  let p3_Index = (p2_Index + 1) % 5;
+  let p4_Index = (p3_Index + 1) % 5;
+  let p5_Index = (p4_Index + 1) % 5;
+
+  let p1_Score = 0;
+  let p2_Score = 0;
+  let p3_Score = 0;
+  let p4_Score = 0;
+  let p5_Score = 0;
+
+  if (players[p1_Index].currentHands == players[p1_Index].myGuess) {
+    p1_Score =
+      players[p1_Index].currentHands == 0
+        ? 10
+        : players[p1_Index].currentHands * 10;
+  }
+  if (players[p2_Index].currentHands == players[p2_Index].myGuess) {
+    p2_Score =
+      players[p2_Index].currentHands == 0
+        ? 10
+        : players[p2_Index].currentHands * 10;
+  }
+  if (players[p3_Index].currentHands == players[p3_Index].myGuess) {
+    p3_Score =
+      players[p3_Index].currentHands == 0
+        ? 10
+        : players[p3_Index].currentHands * 10;
+  }
+  if (players[p4_Index].currentHands == players[p4_Index].myGuess) {
+    p4_Score =
+      players[p4_Index].currentHands == 0
+        ? 10
+        : players[p4_Index].currentHands * 10;
+  }
+  if (players[p5_Index].currentHands == players[p5_Index].myGuess) {
+    p5_Score =
+      players[p5_Index].currentHands == 0
+        ? 10
+        : players[p5_Index].currentHands * 10;
+  }
+
+  if (socket.id == players[p1_Index].id) {
+    socket.emit("completeRound", {
+      roomCode: roomCode,
+      obj: {
+        [p1_Index]: p1_Score,
+        [p2_Index]: p2_Score,
+        [p3_Index]: p3_Score,
+        [p4_Index]: p4_Score,
+        [p5_Index]: p5_Score,
+      },
+      roundNumber: roundNumber,
+    });
+  }
+};
+
+const popWinningPLayer = (name) => {
+  document.querySelector(".winModal p").innerHTML = `🥳 ${name} Won!!! 🥳`;
+  document.querySelector(".overlay-back").style.display = `block`;
+  document.querySelector(".winModal").display = `flex`;
+};
+
+const hidePlayer = () => {
+  setTimeout(() => {
+    documen.querySelector(".winModal p").innerHTML = `🥳 ${name} Won!!! 🥳`;
+    documen.querySelector(".overlay-back").style.display = `none`;
+    document.querySelector(".winModal").display = `none`;
+  }, 3000);
+};
+
+// ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const manageHands = (players, lower, upper, roomCode) => {
+  let p1_index = undefined;
+  players.forEach((p, i) => {
+    if (p.isMyFirstTurn == true) {
+      p1_index = i;
+    }
+  });
+
+  console.log(p1_index);
+  let p2_index = (p1_index + 1) % 5;
+  let p3_index = (p2_index + 1) % 5;
+  let p4_index = (p3_index + 1) % 5;
+  let p5_index = (p4_index + 1) % 5;
+
+  p1_card = { index: p1_index, card: Number(players[p1_index].currentCard) };
+  p2_card = { index: p2_index, card: Number(players[p2_index].currentCard) };
+  p3_card = { index: p3_index, card: Number(players[p3_index].currentCard) };
+  p4_card = { index: p4_index, card: Number(players[p4_index].currentCard) };
+  p5_card = { index: p5_index, card: Number(players[p5_index].currentCard) };
+
+  let firstPlayerCard = p1_card.card;
+  let legalupper = undefined;
+  let legalLower = undefined;
+
+  if (firstPlayerCard < 13) {
+    legalLower = 0;
+    legalupper = 12;
+  } else if (firstPlayerCard < 26) {
+    legalLower = 13;
+    legalupper = 25;
+  } else if (firstPlayerCard < 39) {
+    legalLower = 26;
+    legalupper = 38;
+  } else {
+    legalLower = 39;
+    legalupper = 51;
+  }
+
+  let itsLegal = [];
+  let itsTrump = [];
+  let itsUseless = [];
+
+  if (firstPlayerCard >= lower && firstPlayerCard <= upper) {
+    itsTrump.push(p1_card);
+    if (p2_card.card >= lower && p2_card.card <= upper) {
+      itsTrump.push(p2_card);
+    } else {
+      itsUseless.push(p2_card);
+    }
+    if (p3_card.card >= lower && p3_card.card <= upper) {
+      itsTrump.push(p3_card);
+    } else {
+      itsUseless.push(p3_card);
+    }
+    if (p4_card.card >= lower && p4_card.card <= upper) {
+      itsTrump.push(p4_card);
+    } else {
+      itsUseless.push(p4_card);
+    }
+    if (p5_card.card >= lower && p5_card.card <= upper) {
+      itsTrump.push(p5_card);
+    } else {
+      itsUseless.push(p5_card);
+    }
+  } else {
+    itsLegal.push(p1_card);
+    if (p2_card.card >= lower && p2_card.card <= upper) {
+      itsTrump.push(p2_card);
+    } else if (p2_card.card >= legalLower && p2_card.card <= legalupper) {
+      itsLegal.push(p2_card);
+    } else {
+      itsUseless.push(p2_card);
+    }
+    if (p3_card.card >= lower && p3_card.card <= upper) {
+      itsTrump.push(p3_card);
+    } else if (p3_card.card >= legalLower && p3_card.card <= legalupper) {
+      itsLegal.push(p3_card);
+    } else {
+      itsUseless.push(p3_card);
+    }
+    if (p4_card.card >= lower && p4_card.card <= upper) {
+      itsTrump.push(p4_card);
+    } else if (p4_card.card >= legalLower && p4_card.card <= legalupper) {
+      itsLegal.push(p4_card);
+    } else {
+      itsUseless.push(p4_card);
+    }
+    if (p5_card.card >= lower && p5_card.card <= upper) {
+      itsTrump.push(p5_card);
+    } else if (p5_card.card >= legalLower && p5_card.card <= legalupper) {
+      itsLegal.push(p5_card);
+    } else {
+      itsUseless.push(p5_card);
+    }
+  }
+
+  let winningCard = { index: -1, card: -1 };
+
+  if (itsTrump.length != 0) {
+    itsTrump.forEach((pCard) => {
+      if (winningCard.card < pCard.card) {
+        winningCard = pCard;
+      }
+    });
+  } else {
+    itsLegal.forEach((pCard) => {
+      if (winningCard.card < pCard.card) {
+        winningCard = pCard;
+      }
+    });
+  }
+
+  popWinningPLayer(players[winningCard.index].name);
+
+  if (socket.id == players[p1_index].id) {
+    socket.emit("score", { roomCode: roomCode, index: winningCard.index });
+  }
+};
+// ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+// ///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 socket.on("start-round-1", (players) => {
-  console.log(players);
+  //................................................
   document.querySelector(".loby").style.display = "none";
   popPopScoreCard(players, 1);
   hideScoreCard();
-
+  //................................................
   let p1_index = undefined;
   players.forEach((element, index) => {
     if (element.id == socket.id) {
       p1_index = index;
     }
   });
+  //................................................
   const scoreCard = document.querySelector(".score");
   players.forEach((player, index) => {
     scoreCard.innerHTML += `<div>
-         <div>${player.name}</div>
-         <div>${player.myGuess == undefined ? "-" : player.myGuess}</div>
-        </div>`;
+    <div>${player.name}</div>
+          <div>${
+            player.myGuess == undefined ? "-" : `0/${player.myGuess}`
+          }</div>
+    </div>`;
   });
+  //................................................
   document.querySelector(".game .round .trump span").innerHTML = "&#9824;";
   document.querySelector(".game .round .curentRound p span").textContent = 1;
+  //................................................
 
   let p2_index = (p1_index + 1) % 5;
   let p3_index = (p2_index + 1) % 5;
   let p4_index = (p3_index + 1) % 5;
   let p5_index = (p4_index + 1) % 5;
 
+  //................................................
   const otherPlayers = document.querySelector(".otherPlayers");
   otherPlayers.innerHTML = "";
   otherPlayers.innerHTML = `<div class = "otherPlayerInfo">
-                                        <div class='player'>
-                                          <div class="player-playerInfo">
-                                            <p class='player-playerName'>${players[p2_index].name}</p>
-                                          </div>
-                                        </div>
-                                          <p class="player-playerGuessing" id=${players[p2_index].id} style='font-size:13px'>Guessing</p>
+                                <div class='player'>
+                                  <div class="player-playerInfo">
+                                    <p class='player-playerName'>${players[p2_index].name}</p>
                                   </div>
-                                  <div class = "otherPlayerInfo">
-                                        <div class='player'>
-                                          <div class="player-playerInfo">
-                                            <p class='player-playerName'>${players[p3_index].name}</p>
-                                          </div>
-                                        </div>
-                                          <p class="player-playerGuessing" id=${players[p3_index].id} style='font-size:13px'>Guessing</p>
-                                  </div>
-                                  <div class = "otherPlayerInfo">
-                                        <div class='player'>
-                                          <div class="player-playerInfo">
-                                            <p class='player-playerName'>${players[p4_index].name}</p>
-                                          </div>
-                                        </div>
-                                          <p class="player-playerGuessing" id=${players[p4_index].id} style='font-size:13px'>Guessing</p>
-                                  </div>
-                                  <div class = "otherPlayerInfo">
-                                        <div class='player'>
-                                          <div class="player-playerInfo">
-                                            <p class='player-playerName'>${players[p5_index].name}</p>
-                                          </div>
-                                        </div>
-                                          <p class="player-playerGuessing" id=${players[p5_index].id} style='font-size:13px'>Guessing</p>
-                                  </div>`;
+                                </div>
+                                <div class='card-for-p2'></div>
+                                  <p class="player-playerGuessing" id=${players[p2_index].id} style='font-size:13px'>Guessing</p>
+                                </div>
+                              <div class = "otherPlayerInfo">
+                              <div class='player'>
+                              <div class="player-playerInfo">
+                              <p class='player-playerName'>${players[p3_index].name}</p>
+                              </div>
+                              </div>
+                              <div class='card-for-p3'></div>
+                              <p class="player-playerGuessing" id=${players[p3_index].id} style='font-size:13px'>Guessing</p>
+                              </div>
+                              <div class = "otherPlayerInfo">
+                              <div class='player'>
+                              <div class="player-playerInfo">
+                              <p class='player-playerName'>${players[p4_index].name}</p>
+                              </div>
+                              </div>
+                              <div class='card-for-p4'></div>
+                              <p class="player-playerGuessing" id=${players[p4_index].id} style='font-size:13px'>Guessing</p>
+                              </div>
+                              <div class = "otherPlayerInfo">
+                              <div class='player'>
+                              <div class="player-playerInfo">
+                              <p class='player-playerName'>${players[p5_index].name}</p>
+                              </div>
+                              </div>
+                              <div class='card-for-p5'></div>
+                              <p class="player-playerGuessing" id=${players[p5_index].id} style='font-size:13px'>Guessing</p>
+                            </div>`;
 
   document.querySelector(".game").style.display = `flex`;
   document.querySelector(".box").innerHTML = createCards(
     players[p1_index].cards
   );
-  console.log(rc);
+
+  //................................................
+  document.querySelectorAll(".box .card button").forEach((btn) => {
+    btn.disabled = true;
+  });
+  //................................................
+
   if (
     players[p1_index].isMyTurn == true &&
     players[p1_index].isGuessed == false
@@ -481,23 +802,70 @@ socket.on("start-round-1", (players) => {
       data[p1_index].isCompultion == true
     ) {
       guess(data, p1_index, 1, rc, true);
-      console.log(data);
     } else if (
       data[p1_index].isMyTurn == true &&
       data[p1_index].isGuessed == false &&
       data[p1_index].isCompultion == false
     ) {
       guess(data, p1_index, 1, rc);
-      console.log(data);
     } else {
       socket.emit("card1round1", { roundNumber: rc });
     }
     scoreCard.innerHTML = "";
     data.forEach((player, index) => {
       scoreCard.innerHTML += `<div>
-         <div>${player.name}</div>
-         <div>${player.myGuess == undefined ? "-" : player.myGuess}</div>
-        </div>`;
+      <div>${player.name}</div>
+      <div>${player.myGuess == undefined ? "-" : `0/${player.myGuess}`}</div>
+      </div>`;
+    });
+  });
+
+  //................................................
+  socket.on("start-game-1", (data) => {
+    data.forEach((p, i) => {
+      if (p.isMyFirstTurn == true && socket.id == p.id) {
+        playCards(data, 1, rc);
+      }
+    });
+
+    socket.on("card-number", (new_data) => {
+      //................................................
+      let trueIndex = undefined;
+      new_data.forEach((p, i) => {
+        if (p.isMyTurn == true) {
+          trueIndex = i;
+        }
+      });
+      let beforePlayer = trueIndex - 1 < 0 ? trueIndex - 1 + 5 : trueIndex - 1;
+      let caerdId =
+        beforePlayer - p1_index < 0
+          ? beforePlayer - p1_index + 1 + 5
+          : beforePlayer - p1_index + 1;
+      if (caerdId != 1) {
+        let beforePlayerCard = [];
+        beforePlayerCard.push(Number(new_data[beforePlayer].currentCard));
+        document.querySelector(`.card-for-p${caerdId}`).innerHTML =
+          createCards(beforePlayerCard);
+      }
+      //................................................
+      if (
+        socket.id == new_data[trueIndex].id &&
+        new_data[trueIndex].currentCard == undefined
+      ) {
+        const roundWinner = playCards(new_data, 1, rc);
+      }
+    });
+    socket.on("completeItetration", (data) => {
+      manageHands(data, 0, 12, rc);
+    });
+    socket.on("score", (new_data) => {
+      completeRound(new_data, rc, 1);
     });
   });
 });
+
+socket.on("start-round-2", (players) => {
+  // alert("i am round 2");
+  popPopScoreCard(players, 2);
+});
+
