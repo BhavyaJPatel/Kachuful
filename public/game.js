@@ -1,5 +1,5 @@
 // connecting to the socket server
-const socket = io("https://kachuful.onrender.com/");
+const socket = io("https://kachuful.azurewebsites.net");
 
 
 // on connection this code will be executed
